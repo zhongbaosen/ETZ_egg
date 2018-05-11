@@ -55,10 +55,10 @@ module.exports = app => {
     }
   );
 
-    // Country.showList = async function(){
-    //   const result = await this.findAll();
-    //   return result || {};
-    // }
+    Sms.check = async function(){
+      const result = await this.findAll();
+      return result || {};
+    }
   
     return Sms;
   };

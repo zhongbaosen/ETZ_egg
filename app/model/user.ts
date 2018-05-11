@@ -1,4 +1,5 @@
 
+import { Status, StatusCode, Moment } from '../utils';
 module.exports = app => {
     const { STRING, INTEGER } = app.Sequelize;
 
@@ -54,19 +55,94 @@ module.exports = app => {
         return res || {};
     }
 
+    User.check = async function (data) {
+        const { phonenum, receiveaddress, random } = data
+        const resA = await this.findOne({
+            where: {
+                phone: phonenum
+            }
+        })
+
+        if (resA) {
+            if (resA.length != 0) {
+                return {
+                    ...Status(600, StatusCode.PHONE_IS_EXISTED)
+                }
+            }
+        }
+
+        const resB = await this.findOne({
+            where: {
+                receive_address: receiveaddress
+            }
+        })
+
+        if(resB){
+            if (resB.length != 0) {
+                return {
+                    ...Status(600, StatusCode.RECEIVE_ADDRESS_EXISTED)
+                }
+            }
+        }
+        
+
+        const resC = await this.findOne({
+            where: {
+                invite_code: random
+            }
+        })
+
+        if(resC){
+            if (resC.length != 0) {
+                return {
+                    ...Status(600, StatusCode.RANDOM_IS_EXISTED)
+                }
+            }
+        }
+
+
+
+        return {
+            ...Status(201,null)
+        };
+    }
+
     User.insert = async function (data) {
-        const { phonenum, receiveaddress, random, country,countrycode } = data;
+        const { phonenum, receiveaddress, random, country, countrycode } = data;
         const result = await this.bulkCreate([
             {
                 phone: phonenum,
                 receive_address: receiveaddress,
-                invite_code:random,
-                country:country,
-                country_code:countrycode,
-                enter_person:'System',
-                enter_time:'2018-5-11 11:52:38'
+                invite_code: random,
+                country: country,
+                country_code: countrycode,
+                enter_person: 'System',
+                enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
             }
         ]);
+        return result || {};
+    }
+
+    User.findinfo = async function(data){
+        const { address } = data;
+        const result = await this.findOne({
+            where:{
+                receive_address:address
+            },
+            attributes:[  //(attributes)只返回这些字段的参数
+                'phone',
+                ['receive_address','address'], //第一个参数是表的字段名，第二个是输出的字段名(类似xxx as yyy)
+                'country',
+                ['invite_code','invitecode']
+            ]
+        });
+
+        if(!result){  //没有数据时是null值
+            return {
+                ...Status(600,StatusCode.NO_DATE_IS_QUERY)
+            }
+        }
+
         return result || {};
     }
 
