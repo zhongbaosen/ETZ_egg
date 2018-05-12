@@ -21,6 +21,11 @@ export default (appInfo: EggAppConfig) => {
   // add your config here
   config.middleware = [];
 
+  config.bodyParser = {
+    jsonLimit: '1mb',
+    formLimit: '1mb',
+  },
+
   //安全协议
   config.security = {
     csrf:{
@@ -39,7 +44,7 @@ export default (appInfo: EggAppConfig) => {
 
   config.alisms = {
     AccessKeyID:'LTAICx70Wo8k8l2z',
-    AccessKeySecret:'raLLvOZ9XgkqYM5UFQeXRef5ISFtpL',
+    AccessKeySecret:'xxx',
     SignName:'xxx',
     TemplateCode:{
       GET_SMS_CODE:['SMS_131340057','绑定地址验证码'] //获取短信验证码模板ID  验证码${code}，您正在尝试变更重要信息，请妥善保管账户信息。
