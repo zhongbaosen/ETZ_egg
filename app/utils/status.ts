@@ -11,7 +11,7 @@ export default function Rtstatus(status,state){
         case 404:
         return onFalied(status,state)
         case 201:
-        return onSqlSuccess(status)
+        return onSqlSuccess(status,state)
         case 600:
         return onSqlFalied(status,state)
     }
@@ -56,8 +56,9 @@ const onSqlFalied = (_status,state) =>{
  * @param _status 
  * @param state 
  */
-const onSqlSuccess = (_status) =>{
+const onSqlSuccess = (_status,state) =>{
     return {
-        sqlstatus:'Success'
+        sqlstatus:'Success',
+        fields:state
     }
 }

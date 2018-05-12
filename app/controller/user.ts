@@ -56,11 +56,13 @@ export default class UserController extends Controller {
       return;
     }
 
-    const result = await ctx.service.user.sms();
-    ctx.body = {
-      ...result
-    }
-    ctx.status = 200;
-    return;
+
+      var result = await ctx.service.user.sms();
+      console.log("CONTROLLER",result);
+      ctx.body = {
+        ...result
+      }
+      ctx.status = 200;
+      return;
   }
 }
