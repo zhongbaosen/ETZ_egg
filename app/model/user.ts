@@ -55,8 +55,28 @@ module.exports = app => {
         return res || {};
     }
 
+    User.checkCode = async function (data) {
+        const { invite_code } = data
+        const resA = await this.findOne({
+            where: {
+                invite_code: invite_code
+            }
+        })
+
+        if (!resA) {
+            return {
+                ...Status(600, StatusCode.RANDOM_IS_NOTEXISTED)
+            }
+        }
+
+        return {
+            ...Status(201, resA)
+        };
+
+    }
+
     User.check = async function (data) {
-        const { phonenum, receiveaddress, random } = data
+        const { phonenum, receiveaddress } = data
         const resA = await this.findOne({
             where: {
                 phone: phonenum
@@ -64,10 +84,8 @@ module.exports = app => {
         })
 
         if (resA) {
-            if (resA.length != 0) {
-                return {
-                    ...Status(600, StatusCode.PHONE_IS_EXISTED)
-                }
+            return {
+                ...Status(600, StatusCode.PHONE_IS_EXISTED)
             }
         }
 
@@ -77,38 +95,20 @@ module.exports = app => {
             }
         })
 
-        if(resB){
-            if (resB.length != 0) {
-                return {
-                    ...Status(600, StatusCode.RECEIVE_ADDRESS_EXISTED)
-                }
+        if (resB) {
+            return {
+                ...Status(600, StatusCode.RECEIVE_ADDRESS_EXISTED)
             }
         }
-        
-
-        const resC = await this.findOne({
-            where: {
-                invite_code: random
-            }
-        })
-
-        if(resC){
-            if (resC.length != 0) {
-                return {
-                    ...Status(600, StatusCode.RANDOM_IS_EXISTED)
-                }
-            }
-        }
-
 
 
         return {
-            ...Status(201,null)
+            ...Status(201, null)
         };
     }
 
     User.insert = async function (data) {
-        const { phonenum, receiveaddress, random, country, countrycode } = data;
+        const { phonenum, receiveaddress, random, country, countrycode,tran } = data;
         const result = await this.bulkCreate([
             {
                 phone: phonenum,
@@ -119,27 +119,27 @@ module.exports = app => {
                 enter_person: 'System',
                 enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
             }
-        ]);
+        ],{transaction: tran});
         return result || {};
     }
 
-    User.findinfo = async function(data){
+    User.findinfo = async function (data) {
         const { address } = data;
         const result = await this.findOne({
-            where:{
-                receive_address:address
+            where: {
+                receive_address: address
             },
-            attributes:[  //(attributes)只返回这些字段的参数
+            attributes: [  //(attributes)只返回这些字段的参数
                 'phone',
-                ['receive_address','address'], //第一个参数是表的字段名，第二个是输出的字段名(类似xxx as yyy)
+                ['receive_address', 'address'], //第一个参数是表的字段名，第二个是输出的字段名(类似xxx as yyy)
                 'country',
-                ['invite_code','invitecode']
+                ['invite_code', 'invitecode']
             ]
         });
 
-        if(!result){  //没有数据时是null值
+        if (!result) {  //没有数据时是null值
             return {
-                ...Status(600,StatusCode.NO_DATE_IS_QUERY)
+                ...Status(600, StatusCode.NO_DATE_IS_QUERY)
             }
         }
 

@@ -57,7 +57,7 @@ export default class UserController extends Controller {
     }
 
 
-      var result = await ctx.service.user.sms();
+      const result = await ctx.service.user.sms();
       console.log("CONTROLLER",result);
       ctx.body = {
         ...result

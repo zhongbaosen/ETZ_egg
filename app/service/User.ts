@@ -5,6 +5,7 @@ import { Status, CommUtil, StatusCode, SMSClient, Moment } from '../utils';
  */
 export default class User extends Service {
   body: any;
+ // tran: any;
   //默认不需要提供构造函数。
   constructor(ctx) {
     super(ctx); //如果需要在构造函数做一些处理，一定要有这句话，才能保证后面 `this.ctx`的使用。
@@ -15,6 +16,7 @@ export default class User extends Service {
 
   public async entry() {
     const { ctx } = this;
+    return ctx.model.transaction(async t => {  //事务包裹
     const { country_code } = this.body;
     //return this.ctx.model.post.findAndCountAll();
     const resA = await ctx.model.Country.findCode({
@@ -25,7 +27,7 @@ export default class User extends Service {
         ...Status(404, StatusCode.NO_DATE_IS_QUERY)
       }
     }
-    this.body.random = CommUtil.randomnum(10000000, 99999999);
+    this.body.getrandom = CommUtil.randomnum(10000000, 99999999);
     this.body.country = resA[0].country;
     const resB = await this.check();
     console.log('res1', resB);
@@ -34,33 +36,87 @@ export default class User extends Service {
         ...Status(404, resB.failure_reason)
       }
     }
-    return this.insert();
+    return this.insert(t);
+    })
   }
 
-  public async check() {
-    const { phonenum, receiveaddress, random, } = this.body;
+  private async check() {
+    let nowtime = Moment().format('YYYY-MM-DD HH:mm:ss')
+    const { phonenum, receiveaddress, random, invite_code } = this.body;
+    const resA = await this.ctx.model.User.checkCode({
+      invite_code: invite_code
+    })
+    if (resA.sqlstatus == 'Failed') {
+      return {
+        ...Status(600, StatusCode.RANDOM_IS_NOTEXISTED)
+      }
+    }
+    if (resA.fields.phone == phonenum) {
+      return {
+        ...Status(600, StatusCode.PHONE_IS_EXISTED)
+      }
+    }
+    this.body.rephone = resA.fields.phone;
+    this.body.readdress = resA.fields.receive_address;
+    const resB = await this.ctx.model.Sms.checkSms({
+      phonenum: phonenum,
+      random: random,
+      status: '发送短信成功',
+      subtime: nowtime
+    })
+    if (resB.sqlstatus == 'Failed') {
+      return {
+        ...Status(600, StatusCode.VERIFICATION_IS_ERROR)
+      }
+    }
+    const differ = CommUtil.timeSecond(nowtime, resB.fields.enter_time)
+    console.log('相差时间', differ)
+    if (differ > 600) {  //超过10分钟后验证码失效，需要重新获取
+      return {
+        ...Status(600, StatusCode.VERIFICATION_IS_INVALID)
+      }
+    }
+    console.log('获取短信验证', resA)
     const res = await this.ctx.model.User.check({
       phonenum: phonenum,
-      receiveaddress: receiveaddress,
-      random: random
+      receiveaddress: receiveaddress
     });
     return res;
   }
 
-  public async insert() {
+  public async insert(t) {
     const { ctx } = this;
-    const { phonenum, receiveaddress, random, country, country_code } = this.body;
-    const res = await ctx.model.User.insert({
-      phonenum: phonenum,
-      receiveaddress: receiveaddress,
-      random: random,
-      country: country,
-      countrycode: country_code
-    })
-    console.log("插入结果:", res);
-    return {
-      ...Status(200, '')
-    }
+    const { phonenum, receiveaddress, getrandom, country, country_code, rephone, readdress } = this.body;
+      const resA = await ctx.model.User.insert({
+        phonenum: phonenum,
+        receiveaddress: receiveaddress,
+        random: getrandom,
+        country: country,
+        countrycode: country_code,
+        tran: t
+      })
+      console.log("插入结果:", resA);
+      let phone_coin = 1;
+      let rephone_coin = 4;
+      const resB = await ctx.model.Recommend.insert({
+        phone: phonenum,
+        phone_address: receiveaddress,
+        phone_coin: phone_coin,
+        recommend_phone: rephone,
+        recommend_address: readdress,
+        recommend_coin: rephone_coin,
+        status: '未结算',
+        tran: t
+      })
+      console.log("插入结果:", resB);
+      return {
+        ...Status(200, ''),
+        invite_code: resA[0].invite_code,
+        address: resA[0].receive_address,
+        phone: resA[0].phone
+      }
+
+
   }
 
   public async showinfo() {
@@ -144,7 +200,7 @@ export default class User extends Service {
     }
 
     if (!res) {
-      try{
+      try {
         const resB = await ctx.model.Sms.insert({
           phonenum: phonenum,
           country_code: country_code,
@@ -153,7 +209,7 @@ export default class User extends Service {
           remark: error.data
         })
         console.log(resB);
-      }catch(err){
+      } catch (err) {
         // let reserr = (err.message).replace(/Invalid value /g, "").split(" ").join("");
         // this.logger.warn('YOY',reserr.Message);
         // this.logger.warn('SOS',err.message);
@@ -162,7 +218,7 @@ export default class User extends Service {
         };
       }
 
-     // console.log("发送短信失败插入返回结果", resB);
+      // console.log("发送短信失败插入返回结果", resB);
       return {
         ...Status(404, error.data.Message)
       };

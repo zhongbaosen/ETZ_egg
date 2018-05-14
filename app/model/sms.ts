@@ -64,6 +64,31 @@ module.exports = app => {
     }
   );
 
+  Sms.checkSms = async function (data) {
+    const { phonenum, random, status } = data;
+    const result = await this.findOne({   //查找有没有对应手机号的验证码
+      where: {
+        phone: phonenum,
+        random: random,
+        status: status
+      },
+      order: [
+        ['enter_time', 'DESC']
+      ]
+    });
+
+    if (!result || result.length == 0) {  //没有数据时是null值
+      return {
+        ...Status(600, StatusCode.NO_DATE_IS_QUERY)
+      }
+    }
+
+    return {
+      ...Status(201, result || [])
+    };
+  }
+
+
   Sms.check = async function (data) {
     const { phonenum, country_code, status } = data;
     const result = await this.findOne({   //查找有没有相同的
@@ -76,8 +101,6 @@ module.exports = app => {
         ['enter_time', 'DESC']
       ]
     });
-
-    Moment().format('YYYY-MM-DD HH:mm:ss')
 
     if (!result || result.length == 0) {  //没有数据时是null值
       return {
