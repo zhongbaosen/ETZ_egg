@@ -112,7 +112,7 @@ export default class User extends Service {
         ...Status(600, StatusCode.VERIFICATION_IS_INVALID)
       }
     }
-    console.log('获取短信验证', resA)
+    // console.log('获取短信验证', resA)
     const res = await this.ctx.model.User.check({
       phonenum: phonenum,
       receiveaddress: receiveaddress
