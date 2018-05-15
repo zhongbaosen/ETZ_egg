@@ -2,6 +2,10 @@ import { Controller } from 'egg';
 import { ValRule, Status } from '../utils'
 
 export default class UserController extends Controller {
+  t: any;
+  /**
+   * 绑定手机接口
+   */
   public async create() {
     const { ctx } = this;
     // 校验 `ctx.request.body` 是否符合我们预期的格式
@@ -15,15 +19,21 @@ export default class UserController extends Controller {
       }
       return;
     }
-    // const count = await ctx.service.user.find(ctx.request.body);
-    const result = await ctx.service.user.entry();
-    ctx.body = {
-      ...result
-    }
-    ctx.status = 200;
-    return;
+    return ctx.model.transaction(async t => {  //涉及到增删改的必须包裹事务,遇到错误可以自动回滚。
+      this.t = t; //创建事务  可以手动回滚或者提交 例如 this.t.commit() || this.t.rollback()
+      // const count = await ctx.service.user.find(ctx.request.body);
+      const result = await ctx.service.user.entry();
+      ctx.body = {
+        ...result
+      }
+      ctx.status = 200;
+      return;
+    })
   }
 
+  /**
+   * 获取绑定地址接口
+   */
   public async isShow() {
     const { ctx } = this;
     try {
@@ -44,6 +54,9 @@ export default class UserController extends Controller {
     return;
   }
 
+  /**
+   * 发送短信接口
+   */
   public async sendSms() {
     const { ctx } = this;
     try {
@@ -56,13 +69,16 @@ export default class UserController extends Controller {
       return;
     }
 
-
+    return ctx.model.transaction(async t => {
+      this.t = t;
       const result = await ctx.service.user.sms();
-      console.log("CONTROLLER",result);
+      console.log("CONTROLLER", result);
       ctx.body = {
         ...result
       }
       ctx.status = 200;
       return;
+    });
+
   }
 }

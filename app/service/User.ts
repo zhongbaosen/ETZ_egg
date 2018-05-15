@@ -4,8 +4,9 @@ import { Status, CommUtil, StatusCode, SMSClient, Moment } from '../utils';
  * Country Service
  */
 export default class User extends Service {
+  t: any;
   body: any;
- // tran: any;
+  // tran: any;
   //默认不需要提供构造函数。
   constructor(ctx) {
     super(ctx); //如果需要在构造函数做一些处理，一定要有这句话，才能保证后面 `this.ctx`的使用。
@@ -16,28 +17,63 @@ export default class User extends Service {
 
   public async entry() {
     const { ctx } = this;
-    return ctx.model.transaction(async t => {  //事务包裹
-    const { country_code } = this.body;
-    //return this.ctx.model.post.findAndCountAll();
-    const resA = await ctx.model.Country.findCode({
-      country_code: country_code
-    });
-    if (resA.length == 0) {
-      return {
-        ...Status(404, StatusCode.NO_DATE_IS_QUERY)
+      const { country_code } = this.body;
+      //return this.ctx.model.post.findAndCountAll();
+      const resA = await ctx.model.Country.findCode({
+        country_code: country_code
+      });
+      if (resA.length == 0) {
+        return {
+          ...Status(404, StatusCode.NO_DATE_IS_QUERY)
+        }
       }
-    }
-    this.body.getrandom = CommUtil.randomnum(10000000, 99999999);
-    this.body.country = resA[0].country;
-    const resB = await this.check();
-    console.log('res1', resB);
-    if (resB.sqlstatus == 'Failed') {
-      return {
-        ...Status(404, resB.failure_reason)
+      this.body.getrandom = CommUtil.randomnum(10000000, 99999999);
+      this.body.country = resA[0].country;
+      const resB = await this.check();
+      console.log('res1', resB);
+      if (resB.sqlstatus == 'Failed') {
+        return {
+          ...Status(404, resB.failure_reason)
+        }
       }
-    }
-    return this.insert(t);
-    })
+      const { phonenum, receiveaddress, getrandom, country, rephone, readdress } = this.body;
+      try {
+        const resC = await ctx.model.User.insert({
+          phonenum: phonenum,
+          receiveaddress: receiveaddress,
+          random: getrandom,
+          country: country,
+          countrycode: country_code,
+          tran: this.t
+        })
+        console.log("插入结果:", resC);
+
+        let phone_coin = 1;
+        let rephone_coin = 4;
+        const resD = await ctx.model.Recommend.insert({
+          phone: phonenum,
+          phone_address: receiveaddress,
+          phone_coin: phone_coin,
+          recommend_phone: rephone,
+          recommend_address: readdress,
+          recommend_coin: rephone_coin,
+          status: '未结算',
+          tran: this.t
+        })
+        console.log("插入结果:", resD);
+        return {
+          ...Status(200, ''),
+          invite_code: resC[0].invite_code,
+          address: resC[0].receive_address,
+          phone: resC[0].phone
+        }
+      } catch (err) {
+        ctx.logger.error(err);
+        return {
+          ...Status(404, StatusCode.NETWORK_IS_BUSY)
+        }
+      }
+
   }
 
   private async check() {
@@ -84,40 +120,7 @@ export default class User extends Service {
     return res;
   }
 
-  public async insert(t) {
-    const { ctx } = this;
-    const { phonenum, receiveaddress, getrandom, country, country_code, rephone, readdress } = this.body;
-      const resA = await ctx.model.User.insert({
-        phonenum: phonenum,
-        receiveaddress: receiveaddress,
-        random: getrandom,
-        country: country,
-        countrycode: country_code,
-        tran: t
-      })
-      console.log("插入结果:", resA);
-      let phone_coin = 1;
-      let rephone_coin = 4;
-      const resB = await ctx.model.Recommend.insert({
-        phone: phonenum,
-        phone_address: receiveaddress,
-        phone_coin: phone_coin,
-        recommend_phone: rephone,
-        recommend_address: readdress,
-        recommend_coin: rephone_coin,
-        status: '未结算',
-        tran: t
-      })
-      console.log("插入结果:", resB);
-      return {
-        ...Status(200, ''),
-        invite_code: resA[0].invite_code,
-        address: resA[0].receive_address,
-        phone: resA[0].phone
-      }
 
-
-  }
 
   public async showinfo() {
     const { ctx } = this;
@@ -189,7 +192,8 @@ export default class User extends Service {
         type: conf.TemplateCode.GET_SMS_CODE[1],
         status: '发送短信成功',
         bizid: res.BizId,
-        remark: JSON.stringify(res)
+        remark: JSON.stringify(res),
+        tran:this.t
       })
       console.log("发送短信成功插入返回结果", resC);
 
@@ -206,7 +210,8 @@ export default class User extends Service {
           country_code: country_code,
           random: randomCode,
           status: '发送短信失败',
-          remark: error.data
+          remark: error.data,
+          tran:this.t
         })
         console.log(resB);
       } catch (err) {

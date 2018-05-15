@@ -11,6 +11,14 @@ export interface BizConfig {
 export default (appInfo: EggAppConfig) => {
   const config = {} as PowerPartial<EggAppConfig> & BizConfig;
 
+  config.cluster = {
+    listen: {
+      port: 8080,
+      hostname: '127.0.0.1',
+      // path: '/var/run/egg.sock',
+    }
+  }
+
   // app special config
   config.sourceUrl = `https://github.com/eggjs/examples/tree/master/${appInfo.name}`;
 
@@ -43,7 +51,7 @@ export default (appInfo: EggAppConfig) => {
   };
 
   config.alisms = {
-    AccessKeyID:'LTAICx70Wo8k8l2z',
+    AccessKeyID:'xxx',
     AccessKeySecret:'xxx',
     SignName:'xxx',
     TemplateCode:{

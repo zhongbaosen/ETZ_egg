@@ -9,7 +9,8 @@ const statusCode = {
     SMS_IS_OFTEN:'请勿频繁操作',
     VERIFICATION_IS_ERROR:'验证码错误',
     VERIFICATION_IS_INVALID:'验证码失效',
-    RANDOM_IS_NOTEXISTED:'无效邀请码'
+    RANDOM_IS_NOTEXISTED:'无效邀请码',
+    NETWORK_IS_BUSY:'网络正忙,请稍后重试'
 }
 
 export default statusCode;
