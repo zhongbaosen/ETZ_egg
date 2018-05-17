@@ -20,9 +20,9 @@ export default class UserController extends Controller {
       return;
     }
     return ctx.model.transaction(async t => {  //涉及到增删改的必须包裹事务,遇到错误可以自动回滚。
-      this.t = t; //创建事务  可以手动回滚或者提交 例如 this.t.commit() || this.t.rollback()
+      // this.t = t; //创建事务  可以手动回滚或者提交 例如 this.t.commit() || this.t.rollback()
       // const count = await ctx.service.user.find(ctx.request.body);
-      const result = await ctx.service.user.entry();
+      const result = await ctx.service.user.entry(t);
       ctx.body = {
         ...result
       }
@@ -70,8 +70,8 @@ export default class UserController extends Controller {
     }
 
     return ctx.model.transaction(async t => {
-      this.t = t;
-      const result = await ctx.service.user.sms();
+      // this.t = t;
+      const result = await ctx.service.user.sms(t);
       console.log("CONTROLLER", result);
       ctx.body = {
         ...result

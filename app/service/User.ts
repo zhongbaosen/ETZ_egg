@@ -15,7 +15,7 @@ export default class User extends Service {
     this.body = ctx.request.body;
   }
 
-  public async entry() {
+  public async entry(t) {
     const { ctx } = this;
     const { country_code } = this.body;
     //return this.ctx.model.post.findAndCountAll();
@@ -36,8 +36,8 @@ export default class User extends Service {
         ...Status(404, resB.failure_reason)
       }
     }
-    const { phonenum, receiveaddress, getrandom, country, rephone, readdress,invite_code } = this.body;
-    if(!invite_code && invite_code != ''){
+    const { phonenum, receiveaddress, getrandom, country, rephone, readdress, invite_code } = this.body;
+    if (!invite_code && invite_code != '') {
       try {
         const resC = await ctx.model.User.insert({
           phonenum: phonenum,
@@ -45,10 +45,10 @@ export default class User extends Service {
           random: getrandom,
           country: country,
           countrycode: country_code,
-          tran: this.t
+          tran: t
         })
         console.log("插入结果:", resC);
-  
+
         let phone_coin = 1;
         let rephone_coin = 4;
         const resD = await ctx.model.Recommend.insert({
@@ -59,7 +59,7 @@ export default class User extends Service {
           recommend_address: readdress,
           recommend_coin: rephone_coin,
           status: '未结算',
-          tran: this.t
+          tran: t
         })
         console.log("插入结果:", resD);
         return {
@@ -75,7 +75,7 @@ export default class User extends Service {
         }
       }
 
-    }else{
+    } else {
       try {
         const resC = await ctx.model.User.insert({
           phonenum: phonenum,
@@ -86,7 +86,7 @@ export default class User extends Service {
           tran: this.t
         })
         console.log("插入结果:", resC);
-  
+
         let phone_coin = 5;
         const resD = await ctx.model.Recommend.insert({
           phone: phonenum,
@@ -176,20 +176,19 @@ export default class User extends Service {
         fields: []  //没查到值就返回空数组
       }
     }
-    console.log("查询结果:", res);
+    // console.log("查询结果:", res);
     return {
       ...Status(200, ''),
       fields: [res]
     }
   }
 
-  public async sms() {
+  public async sms(t) {
     const { ctx } = this;
     const { phonenum, country_code } = this.body;
     this.logger.info('config', this.config.alisms);
     const smsnum = 60;  //每个手机号的间隔时间
     const conf = this.config.alisms;
-    let error: any;
     let smsClient = new SMSClient({  //初始化sms_client
       accessKeyId: conf.AccessKeyID,
       secretAccessKey: conf.AccessKeySecret
@@ -219,15 +218,26 @@ export default class User extends Service {
       })
     } catch (err) {
       console.log("捕获错误", err.data.Message);
-      error = err;
-      res = null;
+      await ctx.model.Sms.insert({
+        phonenum: phonenum,
+        country_code: country_code,
+        random: randomCode,
+        type: conf.TemplateCode.GET_SMS_CODE[1],
+        status: '发送短信失败',
+        remark: err.data.Message,
+        tran: t
+      })
+      // console.log("发送短信失败插入返回结果", resB);
+      return {
+        ...Status(404, err.data.Message)
+      };
     }
 
-
+    console.log("XXX", res);
 
     //成功发送成功后插入一条记录
     if (res && res.Code == 'OK') {
-      const resC = await ctx.model.Sms.insert({
+      await ctx.model.Sms.insert({
         phonenum: phonenum,
         country_code: country_code,
         random: randomCode,
@@ -235,9 +245,9 @@ export default class User extends Service {
         status: '发送短信成功',
         bizid: res.BizId,
         remark: JSON.stringify(res),
-        tran: this.t
+        tran: t
       })
-      console.log("发送短信成功插入返回结果", resC);
+      // console.log("发送短信成功插入返回结果", resC);
 
 
       return {
@@ -245,32 +255,6 @@ export default class User extends Service {
       }
     }
 
-    if (!res) {
-      try {
-        const resB = await ctx.model.Sms.insert({
-          phonenum: phonenum,
-          country_code: country_code,
-          random: randomCode,
-          status: '发送短信失败',
-          remark: error.data,
-          tran: this.t
-        })
-        console.log(resB);
-      } catch (err) {
-        // let reserr = (err.message).replace(/Invalid value /g, "").split(" ").join("");
-        // this.logger.warn('YOY',reserr.Message);
-        // this.logger.warn('SOS',err.message);
-        return {
-          ...Status(404, error.data.Message)
-        };
-      }
-
-      // console.log("发送短信失败插入返回结果", resB);
-      return {
-        ...Status(404, error.data.Message)
-      };
-
-    }
   }
 }
 
