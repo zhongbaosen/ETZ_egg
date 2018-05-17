@@ -24,7 +24,7 @@ export default class User extends Service {
     });
     if (resA.length == 0) {
       return {
-        ...Status(404, StatusCode.NO_DATE_IS_QUERY)
+        ...Status(404, StatusCode.COUNTRY_ISNT_EXISTED)
       }
     }
     this.body.getrandom = CommUtil.randomnum(10000000, 99999999);

@@ -16,7 +16,7 @@ module.exports = app => {
       comment: "下载人的手机号"
     },
     phone_address: {
-      type: STRING(30),
+      type: STRING(100),
       comment: "下载人地址"
     },
     phone_coin: {
@@ -28,7 +28,7 @@ module.exports = app => {
       comment: "推荐人的手机号"
     },
     recommend_address: {
-      type: STRING(50),
+      type: STRING(100),
       comment: "推荐人地址"
     },
     recommend_coin: {
