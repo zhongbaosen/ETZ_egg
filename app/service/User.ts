@@ -100,9 +100,11 @@ export default class User extends Service {
         console.log("插入结果:", resD);
         return {
           ...Status(200, ''),
-          invite_code: resC[0].invite_code,
-          address: resC[0].receive_address,
-          phone: resC[0].phone
+          data:{
+            invite_code: resC[0].invite_code,
+            address: resC[0].receive_address,
+            phone: resC[0].phone
+          }
         }
       } catch (err) {
         ctx.logger.error(err);
