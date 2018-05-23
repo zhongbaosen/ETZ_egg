@@ -1,7 +1,11 @@
+import { TeleGram } from './app/utils'
+
 module.exports = app => {
-    if (app.config.env === 'local') {
-      app.beforeStart(async () =>{
-        await app.model.sync({force: false});
-      });
-    }
-  };
+  TeleGram(app);   //加载 Telegram电报群
+
+  if (app.config.env === 'local') {
+    app.beforeStart(async () => {
+      await app.model.sync({ force: false });
+    });
+  }
+};

@@ -2,6 +2,7 @@ import Status from './status';
 import CommUtil from './commUtil';
 import StatusCode from './statusCode'
 import ValRule from './valRule'
+import TeleGram from './telegram';
 import * as Moment from 'moment';
 import * as SMSClient from '@alicloud/sms-sdk';
 export {
@@ -10,5 +11,6 @@ export {
     StatusCode,
     ValRule,
     SMSClient,
-    Moment
+    Moment,
+    TeleGram
 }
