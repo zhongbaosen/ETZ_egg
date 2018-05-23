@@ -23,6 +23,9 @@ const createRule = {
       SENDSMS_RULE:{
         country_code:{type: 'string', min: 1,max:4},
         phonenum:{type: 'string', min: 5,max:11}
+      },
+      BIND_ADDRESS_RULE:{
+        address:'string',
       }
 
 }

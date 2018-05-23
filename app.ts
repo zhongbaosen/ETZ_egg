@@ -1,10 +1,10 @@
-import { TeleGram } from './app/utils'
+
 
 module.exports = app => {
-  TeleGram(app);   //加载 Telegram电报群
-
   if (app.config.env === 'local') {
     app.beforeStart(async () => {
+      const ctx = await app.createAnonymousContext();  //创建匿名参数
+      await app.startbot(ctx);
       await app.model.sync({ force: false });
     });
   }

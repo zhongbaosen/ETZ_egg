@@ -146,5 +146,28 @@ module.exports = app => {
         return result || {};
     }
 
+    User.findcode = async function (data) {
+        const { random } = data;
+        const result = await this.findOne({
+            where: {
+                invite_code: random
+            },
+            attributes: [  //(attributes)只返回这些字段的参数
+                'phone',
+                ['receive_address', 'address'], //第一个参数是表的字段名，第二个是输出的字段名(类似xxx as yyy)
+                'country',
+                ['invite_code', 'invitecode']
+            ]
+        });
+
+        if (!result) {  //没有数据时是null值
+            return {
+                ...Status(600, StatusCode.NO_DATE_IS_QUERY)
+            }
+        }
+
+        return result || {};
+    }
+
     return User;
 };

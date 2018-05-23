@@ -8,4 +8,5 @@ export default (app: Application) => {
   router.post('/api/v1/createinfo',controller.user.create);
   router.post('/api/v1/showinfo',controller.user.isShow);
   router.post('/api/v1/sendsms',controller.user.sendSms);
+  router.post('/api/v1/bindwallet',controller.telegram.res);
 };
