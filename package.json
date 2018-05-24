@@ -24,6 +24,7 @@
   "dependencies": {
     "@alicloud/sms-sdk": "^1.1.1",
     "egg": "^2.6.1",
+    "egg-cors": "^2.0.0",
     "egg-scripts": "^2.6.0",
     "egg-sequelize": "^3.1.4",
     "egg-validate": "^1.0.0",
