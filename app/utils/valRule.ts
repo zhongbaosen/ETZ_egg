@@ -24,8 +24,11 @@ const createRule = {
         country_code:{type: 'string', min: 1,max:4},
         phonenum:{type: 'string', min: 5,max:11}
       },
+      /**
+       * 绑定地址新活动
+       */
       BIND_ADDRESS_RULE:{
-        address:'string',
+        address:{type: 'string', required: true, allowEmpty: false,min: 42,max:42}
       }
 
 }
