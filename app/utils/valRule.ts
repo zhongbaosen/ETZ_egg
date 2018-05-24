@@ -28,7 +28,8 @@ const createRule = {
        * 绑定地址新活动
        */
       BIND_ADDRESS_RULE:{
-        address:{type: 'string', required: true, allowEmpty: false,min: 42,max:42}
+        address:{type: 'string', required: true, allowEmpty: false,min: 42,max:42},
+        code:{type: 'string', required: true, allowEmpty: true}
       }
 
 }

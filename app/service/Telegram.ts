@@ -16,9 +16,9 @@ export default class Telegram extends Service {
   public async entry(body) {
     const text = (body.message.text).replace("/", '');
     let atname = '';
-    const { first_name, last_name,username } = body.message.chat;
-    first_name ? atname = first_name +" "+ last_name : null
-    last_name ? atname = first_name +" "+ last_name : null
+    const { first_name, last_name, username } = body.message.chat;
+    first_name ? atname = first_name + " " + last_name : null
+    last_name ? atname = first_name + " " + last_name : null
     username ? atname = username : null
     console.log("获取信息:", body);
     const resA = await this.ctx.model.User.checkCode({
@@ -27,6 +27,11 @@ export default class Telegram extends Service {
     if (resA.sqlstatus == 'Failed') {
       return `@${atname} Your code is invalid \n\n 您的邀请码无效`;
     }
+
+    // const { receive_address } = resA.fields
+
+
+
     return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`
   }
 
@@ -35,12 +40,12 @@ export default class Telegram extends Service {
    */
   public async bindWallet(t) {
     const { ctx } = this;
-    const { address } = this.body;
+    const { address, code } = this.body;
     const getrandom = CommUtil.randomRange();
     const resA = await ctx.model.User.findinfo({
       address: address,
     })
-    console.log("resA",resA);
+    console.log("resA", resA);
     if (resA.sqlstatus == 'Success') {
       return {
         ...Status(404, StatusCode.RECEIVE_ADDRESS_EXISTED)
@@ -55,13 +60,54 @@ export default class Telegram extends Service {
         ...Status(404, StatusCode.NETWORK_IS_BUSY)
       }
     }
+
+    if (code) {
+      const resC = await ctx.model.User.findcode({
+        random: code,
+      })
+      //console.log("resB",resB);
+      if (resC.sqlstatus == 'Failed') {
+        return {
+          ...Status(404, StatusCode.RANDOM_IS_NOTEXISTED)
+        }
+      }
+
+      const phone_address = resC.fields.address;
+
+
+      try {
+        await ctx.model.User.insert({
+          receiveaddress: address,
+          random: getrandom,
+          tran: t
+        })
+        await ctx.model.Recommend.insertat({
+          phone_address: phone_address,
+          phone_coin: '1',
+          recommend_address: address,
+          recommend_coin: '1',
+          status: '未结算',
+          tran: t
+        })
+
+      } catch (err) {
+        ctx.logger.error(err);
+        return {
+          ...Status(404, StatusCode.NETWORK_IS_BUSY)
+        }
+      }
+      return {
+        ...Status(200, null),
+        code: getrandom
+      }
+    }
     try {
-      const resC = await ctx.model.User.insert({
+      const resF = await ctx.model.User.insert({
         receiveaddress: address,
         random: getrandom,
         tran: t
       })
-      console.log(resC);
+      console.log(resF);
     } catch (err) {
       ctx.logger.error(err);
       return {
