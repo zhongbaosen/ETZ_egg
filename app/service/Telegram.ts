@@ -13,7 +13,8 @@ export default class Telegram extends Service {
    * 处理telegram的事件
    * @param body 
    */
-  public async entry(body) {
+  public async entry(body, t) {
+    const { ctx } = this;
     const text = (body.message.text).replace("/", '');
     let atname = '';
     const { first_name, last_name, username } = body.message.chat;
@@ -28,11 +29,27 @@ export default class Telegram extends Service {
       return `@${atname} Your code is invalid \n\n 您的邀请码无效`;
     }
 
-    // const { receive_address } = resA.fields
+    try {
+      const resB = await ctx.model.Recommend.updatail({
+        phone_coin: '1',
+        code: text,
+        recommend_coin: '4',
+        status: '已激活',
+        tran: t
+      })
+      console.log(resB);
+      if(resB.fields[0] > 0){
+        return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`
+      }
+      else{
+        return `@${atname} Your code activation failed,Please try again later \n\n 您的邀请码激活失败,请稍后重试`;
+      }
+    } catch (err) {
+      ctx.logger.error(err);
+      return `@${atname} The server is busy,Please try again later \n\n 服务器繁忙，请稍后再试`;
+    }
 
-
-
-    return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`
+   
   }
 
   /**
@@ -83,10 +100,10 @@ export default class Telegram extends Service {
         })
         await ctx.model.Recommend.insertat({
           phone_address: phone_address,
-          phone_coin: '1',
+          phone_coin: '0',
           recommend_address: address,
-          recommend_coin: '1',
-          status: '未结算',
+          recommend_coin: '0',
+          status: '未激活',
           tran: t
         })
 
@@ -101,6 +118,7 @@ export default class Telegram extends Service {
         code: getrandom
       }
     }
+
     try {
       const resF = await ctx.model.User.insert({
         receiveaddress: address,

@@ -35,6 +35,10 @@ module.exports = app => {
       type: DECIMAL(23, 10),
       comment: "推荐人得到的etz"
     },
+    invite_code: {
+      type: STRING(20),
+      comment: "关联的邀请码"
+    },
     status: {
       type: STRING(20),
       comment: "状态"
@@ -60,7 +64,7 @@ module.exports = app => {
   }
 
   Recommend.insert = async function (data) {
-    const { phone,phone_address,phone_coin,recommend_phone,recommend_address,recommend_coin,status,tran } = data
+    const { phone, phone_address, phone_coin, recommend_phone, recommend_address, recommend_coin, status, tran } = data
     const result = await this.bulkCreate([
       {
         phone: phone,
@@ -69,33 +73,51 @@ module.exports = app => {
         recommend_phone: recommend_phone,
         recommend_address: recommend_address,
         recommend_coin: recommend_coin,
-        status:status,
-        enter_person:'System',
+        status: status,
+        enter_person: 'System',
         enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
       }
-    ],{transaction: tran});
+    ], { transaction: tran });
 
     return {
-      ...Status(201,result)
+      ...Status(201, result)
     }
   }
 
   Recommend.insertat = async function (data) {
-    const { phone_address,phone_coin,recommend_address,recommend_coin,status,tran } = data
+    const { phone_address, phone_coin, recommend_address, recommend_coin, status, tran } = data
     const result = await this.bulkCreate([
       {
         phone_address: phone_address,
         phone_coin: phone_coin,
         recommend_address: recommend_address,
         recommend_coin: recommend_coin,
-        status:status,
-        enter_person:'System',
+        status: status,
+        enter_person: 'System',
         enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
       }
-    ],{transaction: tran});
+    ], { transaction: tran });
 
     return {
-      ...Status(201,result)
+      ...Status(201, result)
+    }
+  }
+
+  Recommend.updatail = async function (data) {
+    const { phone_coin, code, recommend_coin, status, tran } = data
+    const result = await this.update(
+      {
+        phone_coin: phone_coin,
+        recommend_coin: recommend_coin,
+        status: status
+      }, {
+        where: {
+          invite_code: code
+        }, transaction: tran
+      });
+
+    return {
+      ...Status(201, result)
     }
   }
 
