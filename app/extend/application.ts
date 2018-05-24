@@ -31,11 +31,11 @@ module.exports = {
           ctx.reply(result)
         })
       
-        telbot.on('message', (ctx) => {
-          console.log("xx", ctx.message);
-          console.log("有消息进来了")
-          return ctx.reply('Hello')
-        })
+        // telbot.on('message', (ctx) => {
+        //   console.log("xx", ctx.message);
+        //   console.log("有消息进来了")
+        //   return ctx.reply('Hello')
+        // })
       
         await telbot.startPolling()
 
