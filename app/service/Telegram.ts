@@ -31,17 +31,16 @@ export default class Telegram extends Service {
 
     try {
       const resB = await ctx.model.Recommend.updatail({
-        phone_coin: '1',
         code: text,
-        recommend_coin: '4',
+        type: '推荐奖励',
         status: '已激活',
         tran: t
       })
       console.log(resB);
-      if(resB.fields[0] > 0){
+      if (resB.fields[0] > 0) {
         return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`
       }
-      else{
+      else {
         return `@${atname} Your code activation failed,Please try again later \n\n 您的邀请码激活失败,请稍后重试`;
       }
     } catch (err) {
@@ -49,7 +48,8 @@ export default class Telegram extends Service {
       return `@${atname} The server is busy,Please try again later \n\n 服务器繁忙，请稍后再试`;
     }
 
-   
+
+
   }
 
   /**
@@ -66,7 +66,7 @@ export default class Telegram extends Service {
     if (resA.sqlstatus == 'Success') {
       return {
         ...Status(200, null),
-        code:resA.fields.invitecode
+        code: resA.fields.invitecode
       }
     }
     const resB = await ctx.model.User.findcode({
@@ -101,10 +101,11 @@ export default class Telegram extends Service {
         })
         await ctx.model.Recommend.insertat({
           phone_address: phone_address,
-          phone_coin: '0',
+          phone_coin: '1',
           recommend_address: address,
-          recommend_coin: '0',
-          code:code,
+          recommend_coin: '4',
+          code: code,
+          type: '推荐奖励',
           status: '未激活',
           tran: t
         })
@@ -121,22 +122,8 @@ export default class Telegram extends Service {
       }
     }
 
-    try {
-      const resF = await ctx.model.User.insert({
-        receiveaddress: address,
-        random: getrandom,
-        tran: t
-      })
-      console.log(resF);
-    } catch (err) {
-      ctx.logger.error(err);
-      return {
-        ...Status(404, StatusCode.NETWORK_IS_BUSY)
-      }
-    }
     return {
-      ...Status(200, null),
-      code: getrandom
+      ...Status(404, StatusCode.NETWORK_IS_BUSY)
     }
 
   }

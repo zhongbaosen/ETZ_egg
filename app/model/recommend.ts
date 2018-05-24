@@ -39,6 +39,10 @@ module.exports = app => {
       type: STRING(20),
       comment: "关联的邀请码"
     },
+    type: {
+      type: STRING(20),
+      comment: "类别"
+    },
     status: {
       type: STRING(20),
       comment: "状态"
@@ -85,7 +89,7 @@ module.exports = app => {
   }
 
   Recommend.insertat = async function (data) {
-    const { phone_address,code, phone_coin, recommend_address, recommend_coin, status, tran } = data
+    const { phone_address,code, phone_coin, recommend_address, recommend_coin, status,type, tran } = data
     const result = await this.bulkCreate([
       {
         phone_address: phone_address,
@@ -94,6 +98,7 @@ module.exports = app => {
         recommend_coin: recommend_coin,
         invite_code:code,
         status: status,
+        type:type,
         enter_person: 'System',
         enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
       }
@@ -105,15 +110,14 @@ module.exports = app => {
   }
 
   Recommend.updatail = async function (data) {
-    const { phone_coin, code, recommend_coin, status, tran } = data
+    const {  code, status,type, tran } = data
     const result = await this.update(
       {
-        phone_coin: phone_coin,
-        recommend_coin: recommend_coin,
         status: status
       }, {
         where: {
-          invite_code: code
+          invite_code: code,
+          type:type
         }, transaction: tran
       });
 
