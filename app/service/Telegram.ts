@@ -104,7 +104,7 @@ export default class Telegram extends Service {
           phone_coin: '1',
           recommend_address: address,
           recommend_coin: '4',
-          code: code,
+          code: getrandom,
           type: '推荐奖励',
           status: '未激活',
           tran: t
