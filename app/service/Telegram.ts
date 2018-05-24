@@ -103,6 +103,7 @@ export default class Telegram extends Service {
           phone_coin: '0',
           recommend_address: address,
           recommend_coin: '0',
+          code:code,
           status: '未激活',
           tran: t
         })

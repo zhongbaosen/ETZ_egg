@@ -85,13 +85,14 @@ module.exports = app => {
   }
 
   Recommend.insertat = async function (data) {
-    const { phone_address, phone_coin, recommend_address, recommend_coin, status, tran } = data
+    const { phone_address,code, phone_coin, recommend_address, recommend_coin, status, tran } = data
     const result = await this.bulkCreate([
       {
         phone_address: phone_address,
         phone_coin: phone_coin,
         recommend_address: recommend_address,
         recommend_coin: recommend_coin,
+        invite_code:code,
         status: status,
         enter_person: 'System',
         enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
