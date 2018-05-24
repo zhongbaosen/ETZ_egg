@@ -65,7 +65,8 @@ export default class Telegram extends Service {
     console.log("resA", resA);
     if (resA.sqlstatus == 'Success') {
       return {
-        ...Status(404, StatusCode.RECEIVE_ADDRESS_EXISTED)
+        ...Status(200, null),
+        code:resA.fields.invitecode
       }
     }
     const resB = await ctx.model.User.findcode({
