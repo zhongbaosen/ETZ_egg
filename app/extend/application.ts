@@ -24,7 +24,7 @@ module.exports = {
         telbot.hears(/buy/i, async (ctx) => {
           ctx.reply('Buy-buy')
         })
-        telbot.hears(/\d/i, async (ctx) => {
+        telbot.hears(/\//i, async (ctx) => {
           const result = await body.model.transaction(async t => {
             return await body.service.telegram.entry(ctx,t);
           }) 
