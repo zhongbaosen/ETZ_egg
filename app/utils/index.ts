@@ -4,6 +4,7 @@ import StatusCode from './statusCode'
 import ValRule from './valRule'
 import * as Moment from 'moment';
 import * as SMSClient from '@alicloud/sms-sdk';
+const ethUtil = require('ethereumjs-util');
 export {
     Status,
     CommUtil,
@@ -11,4 +12,5 @@ export {
     ValRule,
     SMSClient,
     Moment,
+    ethUtil
 }

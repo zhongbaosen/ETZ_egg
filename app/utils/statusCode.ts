@@ -11,7 +11,8 @@ const statusCode = {
     VERIFICATION_IS_INVALID:'验证码失效',
     RANDOM_IS_NOTEXISTED:'无效邀请码',
     NETWORK_IS_BUSY:'网络正忙,请稍后重试',
-    COUNTRY_ISNT_EXISTED:'此国家码不支持'
+    COUNTRY_ISNT_EXISTED:'此国家码不支持',
+    ADDRESS_IS_INVALID:'非法地址'
 }
 
 export default statusCode;
