@@ -143,7 +143,9 @@ module.exports = app => {
             }
         }
 
-        return result || {};
+        return {
+            ...Status(201, result.dataValues)
+        }
     }
 
     User.findcode = async function (data) {
@@ -166,7 +168,11 @@ module.exports = app => {
             }
         }
 
-        return result || {};
+        return {
+            ...Status(201, result.dataValues)
+        }
+
+        // return result || {};
     }
 
     return User;

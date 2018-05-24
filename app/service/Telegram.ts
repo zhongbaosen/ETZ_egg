@@ -40,8 +40,8 @@ export default class Telegram extends Service {
     const resA = await ctx.model.User.findinfo({
       address: address,
     })
-    //console.log("resA",resA);
-    if (resA) {
+    console.log("resA",resA);
+    if (resA.sqlstatus == 'Success') {
       return {
         ...Status(404, StatusCode.RECEIVE_ADDRESS_EXISTED)
       }
@@ -50,7 +50,7 @@ export default class Telegram extends Service {
       random: getrandom,
     })
     //console.log("resB",resB);
-    if (resB) {
+    if (resB.sqlstatus == 'Success') {
       return {
         ...Status(404, StatusCode.NETWORK_IS_BUSY)
       }
