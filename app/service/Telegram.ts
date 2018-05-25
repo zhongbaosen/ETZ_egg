@@ -12,32 +12,49 @@ export default class Telegram extends Service {
   /**
    * 处理telegram的事件
    * @param body 
+   * @param t
    */
   public async entry(body, t) {
     const { ctx } = this;
+    const {id} = body.message.from
     const text = (body.message.text).replace("/", '');
     let atname = '';
     const { first_name, last_name, username } = body.message.chat;
     first_name ? atname = first_name + " " + last_name : null
     last_name ? atname = first_name + " " + last_name : null
     username ? atname = username : null
-    console.log("获取信息:", body);
+    // console.log("获取信息:", body);
     const resA = await this.ctx.model.User.checkCode({
       invite_code: text
     })
     if (resA.sqlstatus == 'Failed') {
-      return `@${atname} Your code is invalid \n\n 您的邀请码无效`;
+      return `@${atname} Your invitation code is invalid \n\n 您的邀请码无效`;
+    }
+    if(resA.fields.telid){
+      const resB = await this.ctx.model.User.checktelid({
+        telid: String(id),
+        tran: t
+      })
+      console.log(resB);
+      if(resB.fields.telid === String(id)){
+        return `@${atname} You have been bound to other addresses without repeated bindings \n\n 你已经绑定其他地址，无需重复绑定 \n\n  Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`;
+      }
     }
 
+
     try {
-      const resB = await ctx.model.Recommend.updatail({
+      await ctx.model.User.updateid({
+        telid: id,
+        code:text,
+        tran: t
+      })
+      const resD = await ctx.model.Recommend.updatail({
         code: text,
         type: '推荐奖励',
         status: '已激活',
         tran: t
       })
-      console.log(resB);
-      if (resB.fields[0] > 0) {
+      if (resD.fields[0] > 0) {
         return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`
       }
       else {

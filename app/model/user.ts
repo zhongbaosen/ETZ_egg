@@ -13,6 +13,10 @@ module.exports = app => {
             type: STRING(100),
             comment: "手机号"
         },
+        telid: {
+            type: STRING(100),
+            comment: "唯一id"
+        },
         receive_address: {
             type: STRING(100),
             comment: "空投地址"
@@ -66,6 +70,26 @@ module.exports = app => {
         if (!resA) {
             return {
                 ...Status(600, StatusCode.RANDOM_IS_NOTEXISTED)
+            }
+        }
+
+        return {
+            ...Status(201, resA)
+        };
+
+    }
+
+    User.checktelid = async function (data) {
+        const { telid } = data
+        const resA = await this.findOne({
+            where: {
+                telid: telid
+            },raw:true
+        })
+
+        if (!resA) {
+            return {
+                ...Status(600, StatusCode.TELE_IS_EXISTED)
             }
         }
 
@@ -174,6 +198,23 @@ module.exports = app => {
 
         // return result || {};
     }
+
+    User.updateid = async function (data) {
+        const {  telid,code, tran } = data
+        const result = await this.update(
+          {
+            telid: telid
+          }, {
+            where: {
+              invite_code: code,
+              telid:null
+            }, transaction: tran
+          });
+    
+        return {
+          ...Status(201, result)
+        }
+      }
 
     return User;
 };
