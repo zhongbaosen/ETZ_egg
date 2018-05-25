@@ -87,6 +87,8 @@ module.exports = app => {
             },raw:true
         })
 
+        console.log("XXX",resA);
+
         if (!resA) {
             return {
                 ...Status(600, StatusCode.TELE_IS_EXISTED)
