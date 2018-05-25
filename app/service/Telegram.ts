@@ -32,7 +32,7 @@ export default class Telegram extends Service {
     if (resA.sqlstatus == 'Failed') {
       return `@${atname} Your invitation code is invalid \n\n 您的邀请码无效`;
     }
-    if(resA.fields.telid){
+
       const resB = await this.ctx.model.User.checktelid({
         telid: String(id),
         tran: t
@@ -41,8 +41,6 @@ export default class Telegram extends Service {
       if(resB.fields.telid === String(id)){
         return `@${atname} You have been bound to other addresses without repeated bindings \n\n 你已经绑定其他地址，无需重复绑定 \n\n  Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`;
       }
-    }
-
 
     try {
       await ctx.model.User.updateid({
