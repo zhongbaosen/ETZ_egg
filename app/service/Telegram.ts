@@ -37,10 +37,13 @@ export default class Telegram extends Service {
         telid: String(id),
         tran: t
       })
-      console.log(resB);
-      if(resB.fields.telid === String(id)){
-        return `@${atname} You have been bound to other addresses without repeated bindings \n\n 你已经绑定其他地址，无需重复绑定 \n\n  Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`;
+      if(resB.sqlstatus == 'Success'){
+        console.log(resB);
+        if(resB.fields.telid === String(id)){
+          return `@${atname} You have been bound to other addresses without repeated bindings \n\n 你已经绑定其他地址，无需重复绑定 \n\n  Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`;
+        }
       }
+
 
     try {
       await ctx.model.User.updateid({
