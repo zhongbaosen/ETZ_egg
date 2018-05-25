@@ -27,4 +27,23 @@ export default class CountryController extends Controller {
       ctx.body = await ctx.service.telegram.bindWallet(t);
     });
   }
+
+  /**
+   * 查询已邀请人数接口
+   */
+  public async show(){
+    const { ctx } = this;
+    try {
+      ctx.validate(ValRule.GET_INVITE_RULE);
+    } catch (err) {
+      ctx.logger.warn(err.errors);
+      ctx.body = {
+        ...Status(404, err.errors)
+      }
+      return;
+    }
+    return ctx.model.transaction(async t => {
+      ctx.body = await ctx.service.telegram.showinvite(t);
+    });
+  }
 }

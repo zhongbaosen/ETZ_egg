@@ -3,7 +3,7 @@ import { Status, Moment } from '../utils';
  * 推荐表model
  */
 module.exports = app => {
-  const { STRING, INTEGER, DECIMAL } = app.Sequelize;
+  const { STRING, INTEGER, DECIMAL,fn,col } = app.Sequelize;
 
   const Recommend = app.model.define('etz_recommend_record', {
     id: {
@@ -65,6 +65,35 @@ module.exports = app => {
   Recommend.showList = async function () {
     const result = await this.findAll();
     return result || {};
+  }
+
+  Recommend.showinvite = async function (data){
+    const { address } = data
+    const result = await this.findAll({
+      where: {
+        recommend_address: address
+      }
+    })
+
+    return {
+      ...Status(201, result)
+    }
+  }
+
+  Recommend.showgetcon = async function (data){
+    const { address,status } = data
+    const result = await this.findAll(
+      {
+        where:{
+        recommend_address:address,
+        status:status
+      },
+      attributes:[[fn('SUM', col('recommend_coin')), 'sum']],raw:true}
+    )
+
+    return {
+      ...Status(201, result)
+    }
   }
 
   Recommend.insert = async function (data) {

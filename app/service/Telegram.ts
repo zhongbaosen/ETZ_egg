@@ -100,9 +100,9 @@ export default class Telegram extends Service {
           tran: t
         })
         await ctx.model.Recommend.insertat({
-          phone_address: phone_address,
+          phone_address: address,
           phone_coin: '1',
-          recommend_address: address,
+          recommend_address: phone_address,
           recommend_coin: '4',
           code: getrandom,
           type: '推荐奖励',
@@ -126,5 +126,47 @@ export default class Telegram extends Service {
       ...Status(404, StatusCode.NETWORK_IS_BUSY)
     }
 
+  }
+
+  /**
+   * 获取邀请人数业务层
+   */
+  public async showinvite(t){
+    const { ctx } = this;
+    const { code } = this.body;
+    const resA = await ctx.model.User.findcode({
+      random: code,
+      tran: t
+    })
+    console.log(resA);
+    if(resA.sqlstatus == 'Failed' && resA.failure_reason == '无数据'){
+      return {
+        ...Status(404, StatusCode.RANDOM_IS_NOT_EXISTED)
+      }
+    }
+
+    const { address } = resA.fields
+
+    const resB = await ctx.model.Recommend.showinvite({
+      address: address,
+      tran: t
+    })
+    console.log(resB);
+
+    const resC = await ctx.model.Recommend.showgetcon({
+      address: address,
+      status:'已激活',
+      tran: t
+    })
+    console.log(resC);
+    let getetzcon = resC.fields[0].sum
+    !getetzcon ? getetzcon = '0' : getetzcon = Number(getetzcon).toFixed(0)
+    let invitenum = resB.fields.length;
+    invitenum > 0 && invitenum ? invitenum = invitenum + "" : invitenum = '0'
+    return {
+      ...Status(200, null),
+      getetzcon:getetzcon,
+      invitenum:invitenum 
+    }
   }
 }

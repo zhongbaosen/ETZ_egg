@@ -30,7 +30,13 @@ const createRule = {
       BIND_ADDRESS_RULE:{
         address:{type: 'string', required: true, allowEmpty: false,min: 42,max:42},
         code:{type: 'string', required: true, allowEmpty: true}
-      }
+      },
+      /**
+       * 获取邀请人数规则
+       */
+      GET_INVITE_RULE:{
+        code:{type: 'string', required: true, allowEmpty: false,min: 10,max:10}
+      },
 
 }
 

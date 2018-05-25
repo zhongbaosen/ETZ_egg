@@ -6,6 +6,7 @@ const statusCode = {
     PHONE_IS_EXISTED:'手机号已存在',
     RECEIVE_ADDRESS_EXISTED:'空投地址已存在',
     RANDOM_IS_EXISTED:'邀请码已存在',
+    RANDOM_IS_NOT_EXISTED:'邀请码不存在',
     SMS_IS_OFTEN:'请勿频繁操作',
     VERIFICATION_IS_ERROR:'验证码错误',
     VERIFICATION_IS_INVALID:'验证码失效',
