@@ -85,7 +85,7 @@ module.exports = app => {
     const result = await this.findAll(
       {
         where:{
-        recommend_address:address,
+        phone_address:address,
         status:status
       },
       attributes:[[fn('SUM', col('recommend_coin')), 'sum']],raw:true}
