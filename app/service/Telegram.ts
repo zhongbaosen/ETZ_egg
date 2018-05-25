@@ -27,6 +27,8 @@ export default class Telegram extends Service {
     const resA = await this.ctx.model.User.checkCode({
       invite_code: text
     })
+    this.logger.info("拿到的code:",text);
+    this.logger.info("数据",resA);
     if (resA.sqlstatus == 'Failed') {
       return `@${atname} Your invitation code is invalid \n\n 您的邀请码无效`;
     }
