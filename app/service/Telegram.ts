@@ -185,7 +185,7 @@ export default class Telegram extends Service {
     // console.log(resC);
 
     const resD = await ctx.model.Recommend.persongetcon({
-      address: address,
+      code: code,
       type:'个人奖励',
       status:'已激活',
       tran: t

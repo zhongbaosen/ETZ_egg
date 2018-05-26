@@ -81,14 +81,15 @@ module.exports = app => {
   }
 
   Recommend.showgetcon = async function (data){
-    const { address,status } = data
+    const { address,status,type } = data
     const result = await this.findAll(
       {
         where:{
         recommend_address:address,
+        type:type,
         status:status
       },
-      attributes:[[fn('SUM', col('phone_coin')), 'sum']],raw:true}
+      attributes:[[fn('SUM', col('recommend_coin')), 'sum']],raw:true}
     )
 
     return {
@@ -97,14 +98,15 @@ module.exports = app => {
   }
 
   Recommend.persongetcon = async function (data){
-    const { address,status } = data
+    const { code,status,type } = data
     const result = await this.findAll(
       {
         where:{
-        recommend_address:address,
+        invite_code:code,
+        type:type,
         status:status
       },
-      attributes:[[fn('SUM', col('recommend_coin')), 'sum']],raw:true}
+      attributes:[[fn('SUM', col('phone_coin')), 'sum']],raw:true}
     )
 
     return {
