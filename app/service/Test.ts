@@ -10,7 +10,7 @@ export default class Test extends Service {
    * @param name - your name
    */
   public async sayHi() {
-    return '你好';
+    return 'hi';
   }
 }
 
