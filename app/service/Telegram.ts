@@ -15,7 +15,8 @@ export default class Telegram extends Service {
    * @param t
    */
   public async entry(body, t) {
-    const { ctx } = this;
+    console.log('来自电报群的信息:',body.message);
+    const { ctx,config } = this;
     const {id} = body.message.from
     const text = (body.message.text).replace("/", '');
     let atname = '';
@@ -27,8 +28,8 @@ export default class Telegram extends Service {
     const resA = await this.ctx.model.User.checkCode({
       invite_code: text
     })
-    this.logger.info("拿到的code:",text);
-    this.logger.info("数据",resA);
+    // this.logger.info("拿到的code:",text);
+    // this.logger.info("数据",resA);
     if (resA.sqlstatus == 'Failed') {
       return `@${atname} Your invitation code is invalid \n\n 您的邀请码无效`;
     }
@@ -38,9 +39,9 @@ export default class Telegram extends Service {
         tran: t
       })
       if(resB.sqlstatus == 'Success'){
-        console.log(resB);
+        // console.log(resB);
         if(resB.fields.telid === String(id)){
-          return `@${atname} You have been bound to other addresses without repeated bindings \n\n 你已经绑定其他地址，无需重复绑定 \n\n  Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`;
+          return `@${atname} You have been bound to other addresses without repeated bindings \n\n 你已经绑定其他地址，无需重复绑定 \n\n  Your share link （你的分享链接): ${config.teleg.showurl}?code=${text}`;
         }
       }
 
@@ -53,12 +54,12 @@ export default class Telegram extends Service {
       })
       const resD = await ctx.model.Recommend.updatail({
         code: text,
-        type: '推荐奖励',
+        type: '个人奖励',
         status: '已激活',
         tran: t
       })
       if (resD.fields[0] > 0) {
-        return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): http://wisdomcoin.pro/?code=${text}`
+        return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): ${config.teleg.showurl}?code=${text}`
       }
       else {
         return `@${atname} Your code activation failed,Please try again later \n\n 您的邀请码激活失败,请稍后重试`;
@@ -121,11 +122,13 @@ export default class Telegram extends Service {
         })
         await ctx.model.Recommend.insertat({
           phone_address: address,
-          phone_coin: '1',
+          phone_coin: '0.5',
           recommend_address: phone_address,
-          recommend_coin: '4',
+          recommend_coin: '3',
           code: getrandom,
+          rcode:code,
           type: '推荐奖励',
+          gettype:'个人奖励',
           status: '未激活',
           tran: t
         })
@@ -158,7 +161,7 @@ export default class Telegram extends Service {
       random: code,
       tran: t
     })
-    console.log(resA);
+    // console.log(resA);
     if(resA.sqlstatus == 'Failed' && resA.failure_reason == '无数据'){
       return {
         ...Status(404, StatusCode.RANDOM_IS_NOT_EXISTED)
@@ -171,16 +174,28 @@ export default class Telegram extends Service {
       address: address,
       tran: t
     })
-    console.log(resB);
+    // console.log(resB);
 
     const resC = await ctx.model.Recommend.showgetcon({
       address: address,
+      type:'推荐奖励',
       status:'已激活',
       tran: t
     })
-    console.log(resC);
+    // console.log(resC);
+
+    const resD = await ctx.model.Recommend.persongetcon({
+      address: address,
+      type:'个人奖励',
+      status:'已激活',
+      tran: t
+    })
+    // console.log(resD);
     let getetzcon = resC.fields[0].sum
-    !getetzcon ? getetzcon = '0' : getetzcon = Number(getetzcon).toFixed(0)
+    let persongetcon = resD.fields[0].sum
+    !persongetcon || Number(resD.fields[0].sum).toFixed(0) == '0' ?
+    persongetcon = 0 : persongetcon = Number(Number(resD.fields[0].sum).toFixed(1))
+    !getetzcon ? getetzcon = '0' : getetzcon = (Number(getetzcon)+Number(persongetcon)).toFixed(1)
     let invitenum = resB.fields.length;
     invitenum > 0 && invitenum ? invitenum = invitenum + "" : invitenum = '0'
     return {
