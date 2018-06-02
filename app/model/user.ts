@@ -64,7 +64,7 @@ module.exports = app => {
         const resA = await this.findOne({
             where: {
                 invite_code: invite_code
-            }
+            },raw:true
         })
 
         if (!resA) {

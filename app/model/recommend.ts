@@ -144,7 +144,7 @@ module.exports = app => {
         recommend_address: recommend_address,
         recommend_coin: phone_coin,
         invite_code:rcode,
-        status: '已激活',
+        status: status,
         type:type,
         enter_person: 'System',
         enter_time: Moment().format('YYYY-MM-DD HH:mm:ss')
@@ -173,6 +173,23 @@ module.exports = app => {
       }, {
         where: {
           invite_code: code,
+          type:type
+        }, transaction: tran
+      });
+
+    return {
+      ...Status(201, result)
+    }
+  }
+
+  Recommend.updaterecon = async function (data) {
+    const {  phone_address,status,type, tran } = data
+    const result = await this.update(
+      {
+        status: status
+      }, {
+        where: {
+          phone_address:phone_address,
           type:type
         }, transaction: tran
       });

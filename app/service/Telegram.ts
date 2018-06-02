@@ -28,8 +28,8 @@ export default class Telegram extends Service {
     const resA = await this.ctx.model.User.checkCode({
       invite_code: text
     })
-    // this.logger.info("拿到的code:",text);
-    // this.logger.info("数据",resA);
+    this.logger.info("拿到的code:",text);
+    this.logger.info("数据",resA);
     if (resA.sqlstatus == 'Failed') {
       return `@${atname} Your invitation code is invalid \n\n 您的邀请码无效`;
     }
@@ -51,6 +51,12 @@ export default class Telegram extends Service {
         telid: id,
         code:text,
         tran: t
+      })  
+      const resC = await this.ctx.model.Recommend.updaterecon({
+         phone_address:resA.fields.receive_address,
+         type:'推荐奖励',
+         status: '已激活',
+         tran: t
       })
       const resD = await ctx.model.Recommend.updatail({
         code: text,
@@ -58,7 +64,8 @@ export default class Telegram extends Service {
         status: '已激活',
         tran: t
       })
-      if (resD.fields[0] > 0) {
+      console.log(resC);
+      if (resC.fields[0] > 0 && resD.fields[0] > 0) {
         return `@${atname} Your code:${text} is activated successfully,send shared link to your friend right away to get your bonus. \n\n 你的验证码：${text}，已激活成功！立刻发送分享链接给朋友获得空投奖励！\n\n Your share link （你的分享链接): ${config.teleg.showurl}?code=${text}`
       }
       else {
