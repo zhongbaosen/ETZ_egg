@@ -260,5 +260,31 @@ export default class User extends Service {
     }
 
   }
+
+  public async ETZinfo(){
+    // const { ctx } = this;
+    const { platform,version } = this.body;
+    let resA;
+    platform !== 'IOS' && platform !== 'ANDRIOD'?
+    {...Status(404, '')} : null
+    if(version == 'Final'){
+      resA = await this.ctx.model.Version.showFinal({
+        platform:platform,
+        status:'正常'
+      });
+    }
+    else{
+      resA = await this.ctx.model.Version.showList({
+        platform:platform,
+        status:'正常'
+      });
+    }
+    
+    console.log(resA);
+    return {
+      ...Status(200, ''),
+      fields:resA
+    }
+  }
 }
 

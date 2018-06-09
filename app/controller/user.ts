@@ -81,4 +81,30 @@ export default class UserController extends Controller {
     });
 
   }
+
+  /**
+   * 获取OpenETZ版本信息
+   */
+  public async OpenETZinfo(){
+    const { ctx } = this;
+    try {
+      ctx.validate(ValRule.GET_OPENETZ_RULE);
+    } catch (err) {
+      ctx.logger.warn(err.errors);
+      ctx.body = {
+        ...Status(404, err.errors)
+      }
+      return;
+    }
+
+    return ctx.model.transaction(async t => {
+      this.t = t;
+      const result = await ctx.service.user.ETZinfo();
+      ctx.body = {
+        ...result
+      }
+      ctx.status = 200;
+      return;
+    });
+  }
 }

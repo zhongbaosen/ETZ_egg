@@ -37,6 +37,13 @@ const createRule = {
       GET_INVITE_RULE:{
         code:{type: 'string', required: true, allowEmpty: false,min: 10,max:10}
       },
+      /**
+       * 获取OpenETZ版本信息
+       */
+      GET_OPENETZ_RULE:{
+        platform:{type:'string',required: true, allowEmpty: false},
+        version:{type:'string',required: false, allowEmpty: true}
+      }
 
 }
 

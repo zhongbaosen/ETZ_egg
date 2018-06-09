@@ -9,5 +9,6 @@ export default (app: Application) => {
   router.post('/api/v1/showinfo',controller.user.isShow);
   router.post('/api/v1/sendsms',controller.user.sendSms);
   router.post('/api/v1/bindwallet',controller.telegram.res);
-  router.post('/api/v1/showinvite',controller.telegram.show)
+  router.post('/api/v1/showinvite',controller.telegram.show);
+  router.post('/api/v1/showappinfo',controller.user.OpenETZinfo);
 };
