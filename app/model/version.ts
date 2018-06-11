@@ -73,7 +73,7 @@ module.exports = app => {
             },
             order: [['version','DESC']],  //根据version倒序
             attributes: [  //(attributes)只返回这些字段的参数
-                'appname','platform','version','size','url','content'
+                'appname','platform','versiontype','version','size','url','content',['enter_time','update_time']
             ], raw: true
         });
         
@@ -89,7 +89,7 @@ module.exports = app => {
             },
             order: [['version','DESC']],  //根据version倒序
             attributes: [  //(attributes)只返回这些字段的参数
-                'appname','platform','version','size','url','content'
+                'appname','platform','versiontype','version','size','url','content',['enter_time','update_time']
             ], raw: true
         });
         
