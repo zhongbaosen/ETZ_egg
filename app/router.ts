@@ -11,4 +11,7 @@ export default (app: Application) => {
   router.post('/api/v1/bindwallet',controller.telegram.res);
   router.post('/api/v1/showinvite',controller.telegram.show);
   router.post('/api/v1/showappinfo',controller.user.OpenETZinfo);
+
+  app.router.get('/api/v1/upload', app.controller.upload.show);
+  app.router.post('/api/v1/upload', app.controller.upload.upload);
 };
