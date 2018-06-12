@@ -1,17 +1,8 @@
 import { Application } from 'egg';
+import api from './router/api';
+import view from './router/api';
 
 export default (app: Application) => {
-  const { controller, router } = app;
-
-  router.get('/', controller.home.index);
-  router.post('/api/v1/getcountry', controller.country.getCountry);
-  router.post('/api/v1/createinfo',controller.user.create);
-  router.post('/api/v1/showinfo',controller.user.isShow);
-  router.post('/api/v1/sendsms',controller.user.sendSms);
-  router.post('/api/v1/bindwallet',controller.telegram.res);
-  router.post('/api/v1/showinvite',controller.telegram.show);
-  router.post('/api/v1/showappinfo',controller.user.OpenETZinfo);
-
-  app.router.get('/api/v1/upload', app.controller.upload.show);
-  app.router.post('/api/v1/upload', app.controller.upload.upload);
+    api(app);
+    view(app);
 };
