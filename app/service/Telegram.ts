@@ -202,7 +202,8 @@ export default class Telegram extends Service {
     let persongetcon = resD.fields[0].sum
     !persongetcon || Number(resD.fields[0].sum).toFixed(0) == '0' ?
     persongetcon = 0 : persongetcon = Number(Number(resD.fields[0].sum).toFixed(1))
-    !getetzcon ? getetzcon = '0' : getetzcon = (Number(getetzcon)+Number(persongetcon)).toFixed(1)
+    !getetzcon ? getetzcon = '0' : null
+    getetzcon = (Number(getetzcon)+Number(persongetcon)).toFixed(1)
     let invitenum = resB.fields.length;
     invitenum > 0 && invitenum ? invitenum = invitenum + "" : invitenum = '0'
     return {
