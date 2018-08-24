@@ -112,7 +112,7 @@ module.exports = app => {
             id: 1
           },
           attributes: [
-            'versionCode','version','url','content'
+            ['versioncode','versionCode'],'version','url','content'
           ],raw: true
       })
       return result || {}
