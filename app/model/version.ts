@@ -76,7 +76,7 @@ module.exports = app => {
                 'appname','platform','versiontype','version','size','url','content',['enter_time','update_time']
             ], raw: true
         });
-        
+
         return result || {};
     }
 
@@ -92,7 +92,7 @@ module.exports = app => {
                 'appname','platform','versiontype','version','size','url','content',['enter_time','update_time']
             ], raw: true
         });
-        
+
         return result || {};
     }
 
@@ -106,6 +106,17 @@ module.exports = app => {
         return result || {};
     }
 
+    Version.getLatestVersion = async function(){
+      const result = await this.findOne({
+          where :{
+            id: 1
+          },
+          attributes: [
+            'versionCode','version','url','content'
+          ],raw: true
+      })
+      return result || {}
+    }
 
     return Version;
 };
