@@ -1,5 +1,5 @@
 {
-  "name": "egg_etz",
+  "name": "egg_server",
   "version": "1.0.0",
   "description": "a egg ",
   "private": true,
@@ -7,8 +7,8 @@
     "typescript": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-egg_etz",
-    "stop": "egg-scripts stop --title=egg-server-egg_etz",
+    "start": "eggctl start --daemon --title=egg_server",
+    "stop": "eggctl stop --title=egg_server",
     "dev": "egg-bin dev -r egg-ts-helper/register",
     "debug": "egg-bin debug -r egg-ts-helper/register",
     "test-local": "egg-bin test -r egg-ts-helper/register",
